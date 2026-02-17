@@ -1,0 +1,35 @@
+{
+  "$schema": "../../.github/file-policy.schema.json",
+  "tiers": {
+    "high": {
+      "patterns": [
+        ".github/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "package.json",
+        "package-lock.json",
+        "Dockerfile",
+        "docker-compose*.yml",
+        ".env.example"
+      ],
+      "checks": [
+        "build",
+        "test",
+        "lint",
+        "type-check"
+      ]
+    },
+    "low": {
+      "patterns": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "tests/**/*.ts",
+        "tests/**/*.tsx"
+      ],
+      "checks": [
+        "build",
+        "test"
+      ]
+    }
+  }
+}

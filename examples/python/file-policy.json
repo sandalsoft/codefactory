@@ -1,0 +1,35 @@
+{
+  "$schema": "../../.github/file-policy.schema.json",
+  "tiers": {
+    "high": {
+      "patterns": [
+        ".github/**",
+        "pyproject.toml",
+        "setup.py",
+        "setup.cfg",
+        "requirements*.txt",
+        "Dockerfile",
+        "docker-compose*.yml",
+        "Makefile",
+        "tox.ini"
+      ],
+      "checks": [
+        "pytest",
+        "mypy",
+        "ruff",
+        "build"
+      ]
+    },
+    "low": {
+      "patterns": [
+        "src/**/*.py",
+        "tests/**/*.py",
+        "docs/**"
+      ],
+      "checks": [
+        "pytest",
+        "ruff"
+      ]
+    }
+  }
+}
