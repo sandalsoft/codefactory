@@ -1,0 +1,27 @@
+{
+  "$schema": "./file-policy.schema.json",
+  "tiers": {
+    "high": {
+      "patterns": [
+        ".github/**",
+        "Dockerfile",
+        "docker-compose*.yml",
+        "*.lock"
+      ],
+      "checks": [
+        "build",
+        "test",
+        "lint"
+      ]
+    },
+    "low": {
+      "patterns": [
+        "src/**"
+      ],
+      "checks": [
+        "build",
+        "test"
+      ]
+    }
+  }
+}

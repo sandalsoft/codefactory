@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "File Policy Guard Configuration",
+  "description": "Defines file-path-to-risk-tier mappings and required CI checks per tier.",
+  "type": "object",
+  "required": ["tiers"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "tiers": {
+      "type": "object",
+      "required": ["high", "low"],
+      "additionalProperties": false,
+      "properties": {
+        "high": { "$ref": "#/$defs/tier" },
+        "low": { "$ref": "#/$defs/tier" }
+      }
+    }
+  },
+  "$defs": {
+    "tier": {
+      "type": "object",
+      "required": ["patterns", "checks"],
+      "additionalProperties": false,
+      "properties": {
+        "patterns": {
+          "type": "array",
+          "description": "Glob patterns matching file paths. Uses fnmatch-style matching (*, **, ?).",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "checks": {
+          "type": "array",
+          "description": "GitHub Actions check run names that must pass for files matching this tier.",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      }
+    }
+  }
+}
