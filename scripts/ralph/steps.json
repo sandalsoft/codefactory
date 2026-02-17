@@ -1,1 +1,121 @@
-[]
+[
+  {
+    "id": 1,
+    "phase": "structure",
+    "task": "Create the directory structure: examples/typescript/, examples/python/, .github/scripts/. Ensure .github/ and .github/workflows/ already exist.",
+    "files": ["examples/typescript/.gitkeep", "examples/python/.gitkeep", ".github/scripts/.gitkeep"],
+    "done": false
+  },
+  {
+    "id": 2,
+    "phase": "structure",
+    "task": "Create .github/file-policy.json with a default example policy. Two tiers: high (globs for infra/config files like .github/**, Dockerfile, *.lock) and low (globs for general source like src/**). Each tier has a checks array of GitHub Actions check run name strings.",
+    "files": [".github/file-policy.json"],
+    "done": false
+  },
+  {
+    "id": 3,
+    "phase": "structure",
+    "task": "Create .github/file-policy.schema.json — a JSON Schema document describing the policy contract format. Defines the tiers object with high/low keys, each containing patterns (array of glob strings) and checks (array of check run name strings). For editor autocompletion only.",
+    "files": [".github/file-policy.schema.json"],
+    "done": false
+  },
+  {
+    "id": 4,
+    "phase": "evaluation",
+    "task": "Create .github/scripts/evaluate-policy.py — a self-contained Python 3 script. Reads .github/file-policy.json (or path from --policy arg). Accepts changed files via --files arg (comma-separated) or stdin (one per line). Uses fnmatch.fnmatch for glob matching. For each changed file, determines which tier(s) match. Outputs JSON to stdout: {\"tier\": \"high\"|\"low\"|\"none\", \"required_checks\": [...], \"matches\": [{\"file\": \"...\", \"tier\": \"...\", \"matched_pattern\": \"...\"}]}. Highest tier wins (high > low). Exit code 0 always.",
+    "files": [".github/scripts/evaluate-policy.py"],
+    "done": false
+  },
+  {
+    "id": 5,
+    "phase": "evaluation",
+    "task": "Create .github/scripts/format-comment.py — reads evaluation JSON from stdin or --input arg. Outputs a Markdown-formatted PR comment string to stdout. Format: header with tier badge, table of changed files with their matched tier and pattern, list of required checks, and note if dry-run. Accepts --dry-run flag to adjust messaging.",
+    "files": [".github/scripts/format-comment.py"],
+    "done": false
+  },
+  {
+    "id": 6,
+    "phase": "workflow",
+    "task": "Create .github/workflows/file-policy-guard.yml — triggers on pull_request (opened, synchronize, reopened). Defines workflow-level input dry_run (boolean, default false) via workflow_dispatch and also reads it from an env var FILE_POLICY_DRY_RUN. Permissions: pull-requests write, checks read, contents read. Single job on ubuntu-latest. Step 1: checkout with fetch-depth 0.",
+    "files": [".github/workflows/file-policy-guard.yml"],
+    "done": false
+  },
+  {
+    "id": 7,
+    "phase": "workflow",
+    "task": "Add changed-files detection step to file-policy-guard.yml. Uses git diff --name-only against the PR base ref (${{ github.event.pull_request.base.sha }}) to get the list of changed files. Outputs the file list as a step output (newline-separated).",
+    "files": [".github/workflows/file-policy-guard.yml"],
+    "done": false
+  },
+  {
+    "id": 8,
+    "phase": "workflow",
+    "task": "Add policy evaluation step to file-policy-guard.yml. Pipes the changed files list into evaluate-policy.py. Captures the JSON output. Then pipes that into format-comment.py (with --dry-run flag if applicable). Stores both the raw evaluation JSON and formatted comment as step outputs.",
+    "files": [".github/workflows/file-policy-guard.yml"],
+    "done": false
+  },
+  {
+    "id": 9,
+    "phase": "workflow",
+    "task": "Add PR comment step to file-policy-guard.yml. Uses the GitHub API via curl to create or update a PR comment (finds existing comment by a marker string to avoid spam). Posts the formatted Markdown comment from the previous step. Uses GITHUB_TOKEN for auth.",
+    "files": [".github/workflows/file-policy-guard.yml"],
+    "done": false
+  },
+  {
+    "id": 10,
+    "phase": "workflow",
+    "task": "Add enforcement step to file-policy-guard.yml. If not dry-run: reads the evaluation JSON, checks if the resolved tier is high, queries the GitHub Checks API for the required check names, and fails the workflow (exit 1) if any required checks have not passed. If dry-run or tier is none: exit 0. Includes clear error messaging about which checks are missing.",
+    "files": [".github/workflows/file-policy-guard.yml"],
+    "done": false
+  },
+  {
+    "id": 11,
+    "phase": "examples",
+    "task": "Create examples/typescript/file-policy.json — TypeScript project policy. High tier: .github/**, tsconfig.json, package.json, package-lock.json, Dockerfile, docker-compose*.yml with checks [build, test, lint, type-check]. Low tier: src/**/*.ts, src/**/*.tsx, tests/**/*.ts with checks [build, test].",
+    "files": ["examples/typescript/file-policy.json"],
+    "done": false
+  },
+  {
+    "id": 12,
+    "phase": "examples",
+    "task": "Create examples/python/file-policy.json — Python project policy. High tier: .github/**, pyproject.toml, setup.py, setup.cfg, requirements*.txt, Dockerfile, docker-compose*.yml with checks [pytest, mypy, ruff, build]. Low tier: src/**/*.py, tests/**/*.py, docs/** with checks [pytest, ruff].",
+    "files": ["examples/python/file-policy.json"],
+    "done": false
+  },
+  {
+    "id": 13,
+    "phase": "examples",
+    "task": "Create examples/README.md explaining the example policies. Brief intro, then a section per example (TypeScript, Python) explaining the tier rationale: why infra/config files are high-risk, why source files are low-risk, and how to adapt the examples to your project.",
+    "files": ["examples/README.md"],
+    "done": false
+  },
+  {
+    "id": 14,
+    "phase": "documentation",
+    "task": "Create the project README.md. Sections: What is codefactory, Quick Start (3-step: copy files, edit policy, enable workflow), Policy JSON Format (reference with field descriptions), Dry-Run Mode (how to enable, what it outputs), How Enforcement Works (flow diagram in text), Example Policies (links to examples/), Limitations & FAQ.",
+    "files": ["README.md"],
+    "done": false
+  },
+  {
+    "id": 15,
+    "phase": "validation",
+    "task": "Create scripts/test-evaluate.sh — a bash test script that runs evaluate-policy.py against the default policy and both example policies with various changed-file inputs: (1) no matching files, (2) only low-tier files, (3) only high-tier files, (4) mixed high+low files. Asserts expected tier and checks in output. Prints PASS/FAIL per test case.",
+    "files": ["scripts/test-evaluate.sh"],
+    "done": false
+  },
+  {
+    "id": 16,
+    "phase": "validation",
+    "task": "Run scripts/test-evaluate.sh. Fix any bugs in evaluate-policy.py or format-comment.py that the tests reveal. Re-run until all tests pass.",
+    "files": [],
+    "done": false
+  },
+  {
+    "id": 17,
+    "phase": "validation",
+    "task": "Final review: verify all files exist and are complete (no placeholders, no TODOs). Validate JSON files parse correctly with python3 -m json.tool. Verify YAML workflow syntax with python3 yaml.safe_load. Confirm README has no broken links or missing sections.",
+    "files": [],
+    "done": false
+  }
+]
